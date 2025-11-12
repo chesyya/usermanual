@@ -30,7 +30,9 @@ export default function ContentWrapper(props: Props): ReactNode {
     setLoading(true);
     try {
       const docId = location.pathname.replace(/^\/docs\//, '').replace(/\/$/, '');
-      const response = await fetch(`${API_BASE_URL}/docs/content/${docId}`);
+      // 对路径的每一段进行编码，但保留 /
+      const encodedDocId = docId.split('/').map(segment => encodeURIComponent(segment)).join('/');
+      const response = await fetch(`${API_BASE_URL}/docs/content/${encodedDocId}`);
       const data = await response.json();
 
       if (data.success) {

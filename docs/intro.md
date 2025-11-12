@@ -1,11 +1,8 @@
 ---
 id: intro
-title: 动态文档示例
+title: Welcome
 ---
 
-# 动态文档示例
+# Welcome
 
-这个文档内容将从API服务器动态获取。
-
-如果你看到这段文字，说明正在使用静态内容。
-如果API服务器正在运行，内容会被动态替换。
+This page will be dynamically loaded from the API server.

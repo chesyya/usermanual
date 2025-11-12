@@ -5,12 +5,14 @@ import type { Props } from '@theme/DocSidebarItems';
 type PropSidebarItem = Props['items'][number];
 
 
-const API_URL = 'http://localhost:3001/api-server/docs-data';
+const API_URL = 'http://localhost:3001/api/docs/structure';
 
 interface PluginItem {
-  id: string;
+  type: 'doc' | 'category';
+  id?: string;
   label: string;
   path: string;
+  items?: PluginItem[];
 }
 
 // 定义插件目录项的结构类型 (它必须兼容 PropSidebarItem)
@@ -32,21 +34,38 @@ const fetchPromiseRef = {
 };
 
 
+// 递归转换数据结构
+function convertItems(items: PluginItem[]): PropSidebarItem[] {
+  return items.map(item => {
+    if (item.type === 'category') {
+      return {
+        type: 'category',
+        label: item.label,
+        collapsible: true,
+        collapsed: false,
+        items: convertItems(item.items || []),
+      } as PropSidebarItem;
+    } else {
+      const href = `/dynamic-docs/${item.id}`;
+      console.log('[DocSidebarItems] Creating link:', item.label, '-> href:', href);
+      return {
+        type: 'link',
+        label: item.label,
+        href: href,
+      } as PropSidebarItem;
+    }
+  });
+}
+
 // 异步获取数据并构建插件目录项
 function getPluginCategory(data: PluginItem[]): PluginCategory {
-  console.dir()
   return {
     type: 'category',
     label: '插件',
     collapsible: true,
-    collapsed: true,
-    // 确保 link 类型的项目也是 PropSidebarItem 的兼容类型
-    items: data.map(item => ({
-      type: 'link',
-      label: item.label,
-      href: `/dynamic-docs/${item.id}`,
-    })),
-  } as PluginCategory; // 强制断言为 PluginCategory 类型
+    collapsed: false,
+    items: convertItems(data),
+  } as PluginCategory;
 }
 
 // ----------------------------------------------------
@@ -64,10 +83,10 @@ export default function DocSidebarItemsWrapper(props: Props): JSX.Element {
     fetchPromiseRef.isFetched = true;
     const fetchOperation = fetch(API_URL)
       .then(res => res.json())
-      .then((data: PluginItem[]) => {
-        if (Array.isArray(data)) {
-          setPluginItems(data);
-          return data;
+      .then((response: {success: boolean, data: PluginItem[]}) => {
+        if (response.success && Array.isArray(response.data)) {
+          setPluginItems(response.data);
+          return response.data;
         }
         return [];
       })
