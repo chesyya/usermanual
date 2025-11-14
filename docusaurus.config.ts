@@ -9,6 +9,29 @@ const config: Config = {
   tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
 
+  // 1. 使用插件来添加自定义路由
+  plugins: [
+    function customRoutesPlugin(context, options) {
+      return {
+        name: 'custom-routes',
+        async contentLoaded({actions}) {
+          actions.addRoute({
+            // 定义路由路径，使用 :docId 捕获路径的其余部分
+            // 例如：/dynamic-docs/plugin-a/doc1
+            path: '/usermanual/plugins/:docId', 
+            
+            // 设为 false，允许捕获嵌套路径 (例如 /dynamic-docs/a/b)
+            exact: false, 
+            
+            // 指向您将创建的单文件组件
+            component: '@site/src/pages/usermanual.tsx', 
+          });
+        },
+      };
+    },
+    // ... 其他插件
+  ],
+
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4

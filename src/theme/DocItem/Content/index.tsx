@@ -8,10 +8,11 @@ import remarkGfm from 'remark-gfm';
 
 type Props = WrapperProps<typeof ContentType>;
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'http://localhost:5556/usermanual/plugins';
 
 export default function ContentWrapper(props: Props): ReactNode {
   const location = useLocation();
+  console.log('[DocItem/Content] Route updated:', location.pathname);
   const [dynamicContent, setDynamicContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -32,11 +33,15 @@ export default function ContentWrapper(props: Props): ReactNode {
       const docId = location.pathname.replace(/^\/docs\//, '').replace(/\/$/, '');
       // 对路径的每一段进行编码，但保留 /
       const encodedDocId = docId.split('/').map(segment => encodeURIComponent(segment)).join('/');
-      const response = await fetch(`${API_BASE_URL}/docs/content/${encodedDocId}`);
+      const url = `${API_BASE_URL}/docs/content/${encodedDocId}`;
+      console.dir(`Fetching dynamic content from: ${url}`);
+      const response = await fetch(url);
+      console.dir(`Response status: ${response.status}`);
       const data = await response.json();
+      console.dir(data);
 
       if (data.success) {
-        setDynamicContent(data.data.content);
+        setDynamicContent(data.content);
       }
     } catch (error) {
       console.error('Failed to load dynamic content:', error);

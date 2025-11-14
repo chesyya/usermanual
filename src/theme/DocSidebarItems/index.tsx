@@ -5,7 +5,7 @@ import type { Props } from '@theme/DocSidebarItems';
 type PropSidebarItem = Props['items'][number];
 
 
-const API_URL = 'http://localhost:3001/api/docs/structure';
+const API_URL = 'http://localhost:5556/usermanual/plugins/structure';
 
 interface PluginItem {
   type: 'doc' | 'category';
@@ -46,7 +46,7 @@ function convertItems(items: PluginItem[]): PropSidebarItem[] {
         items: convertItems(item.items || []),
       } as PropSidebarItem;
     } else {
-      const href = `/dynamic-docs/${item.id}`;
+      const href = `/usermanual/plugins/${item.id}`;
       console.log('[DocSidebarItems] Creating link:', item.label, '-> href:', href);
       return {
         type: 'link',
@@ -85,6 +85,7 @@ export default function DocSidebarItemsWrapper(props: Props): JSX.Element {
       .then(res => res.json())
       .then((response: {success: boolean, data: PluginItem[]}) => {
         if (response.success && Array.isArray(response.data)) {
+          console.dir(`插件数据加载成功：${JSON.stringify(response.data[0])}`);
           setPluginItems(response.data);
           return response.data;
         }

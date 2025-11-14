@@ -10,7 +10,7 @@ import remarkGfm from 'remark-gfm';
 
 type Props = WrapperProps<typeof NotFoundType>;
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'http://localhost:5556/usermanual/plugins';
 
 interface DocContent {
   title: string;
@@ -47,8 +47,9 @@ export default function NotFoundWrapper(props: Props): ReactNode {
     fetch(`${API_BASE_URL}/docs/content/${encodedDocId}`)
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.data) {
-          setDynamicContent(data.data);
+        console.dir(`data: ${JSON.stringify(data.content)}`);
+        if (data.success && data.content) {
+          setDynamicContent(data.content);
           setIsNotFound(false);
         } else {
           setIsNotFound(true);
